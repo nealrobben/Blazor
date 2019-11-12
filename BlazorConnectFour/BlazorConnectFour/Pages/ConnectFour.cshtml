@@ -1,9 +1,45 @@
 ﻿@page "/connectfour"
 @using BlazorConnectFour.Data
+@using Microsoft.AspNetCore.Components.Web
 
 @{
     GameBoard board = new GameBoard();
     PieceColor currentTurn = PieceColor.Red;
+
+    void PieceClicked(EventArgs args, int x, int y)
+    {
+        var clickedSpace = board.Board[x, y];
+        Console.WriteLine("PieceClicked");
+
+        if (clickedSpace.Color == PieceColor.Blank)
+        {
+            while (y < 5)
+            {
+                var nextSpace = board.Board[x, y + 1];
+                y = y + 1;
+                if (nextSpace.Color == PieceColor.Blank)
+                {
+                    clickedSpace = nextSpace;
+                }
+            }
+
+            clickedSpace.Color = currentTurn;
+
+            SwitchTurns();
+        }
+    }
+
+    void SwitchTurns()
+    {
+        if (currentTurn == PieceColor.Red)
+        {
+            currentTurn = PieceColor.Yellow;
+        }
+        else
+        {
+            currentTurn = PieceColor.Red;
+        }
+    }
 }
 
 <!DOCTYPE html>
@@ -15,21 +51,23 @@
     <link href="css/site.css" rel="stylesheet" />
 </head>
 <body>
-<h1>Connect Four</h1>
+    <h1>Connect Four</h1>
 
-<h2>@currentTurn's Turn!</h2>
+    <h2>@currentTurn's Turn!</h2>
 
-<div class="board">
-    @for (int i = 0; i < 7; i++)
-    {
-        <div class="column">
-            @for (int j = 0; j < 6; j++)
-            {
-                <div class="gamepiece @board.Board[i,j].Color.ToString().ToLower()"></div>
-            }
-        </div>
-    }
-</div>
+    <div class="board">
+        @for (int i = 0; i < 7; i++)
+        {
+            <div class="column">
+                @for (int j = 0; j < 6; j++)
+                {
+                    int x = i;
+                    int y = j;
+                    <div class="gamepiece @board.Board[i,j].Color.ToString().ToLower()" onclick="@((Action<EventArgs>)(args => PieceClicked(args,x,y)))"></div>
+                }
+            </div>
+        }
+    </div>
 
 </body>
 </html>
